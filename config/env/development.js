@@ -1,3 +1,4 @@
 module.exports = {
-    //opcje konfiguracyjne dla środowiska development
+    //ważne, żeby cookie secret (string) był inny w każdym środowisku (dev/prod)
+    sessionSecret: 'developmentSessionSecret'
 };

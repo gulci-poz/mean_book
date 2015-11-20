@@ -1,10 +1,12 @@
 //tutaj konfigurujemy aplikację express, tutaj dodajemy wszystko związane z konfiguracją express
 
-var express = require('express'),
+var config = require('./config'),
+    express = require('express'),
     morgan = require('morgan'),
     compress = require('compression'),
     bodyParser = require('body-parser'),
-    methodOverride = require('method-override');
+    methodOverride = require('method-override'),
+    session = require('express-session');
 
 module.exports = function() {
     var app = express();
@@ -27,11 +29,22 @@ module.exports = function() {
     app.use(bodyParser.json());
     app.use(methodOverride());
 
+    //podpisany identyfikator użytkownika będzie przechowywany w ciasteczkach
+    //middleware session dodaje obiekt session do wszystkich obiektów request w aplikacji
+    app.use(session({
+        saveUninitialized: true,
+        resave: true,
+        secret: config.sessionSecret
+    }));
+
     //kofiguracja widoku aplikacji
     app.set('views', './app/views');
     app.set('view engine', 'ejs');
 
     require('../app/routes/index.server.routes.js')(app);
+
+    //gdybyśmy dali możliwość serwowania statycznych plików przed pobraniem routingu, to express szukałby najpierw ścieżek żądań HTTP w folderze z plikami statycznymi, byłaby chwilowa blokada w oczekiwaniu na odpowiedź z systemu plików
+    app.use(express.static('./public'));
 
     //zwraxamy instancję aplikacji
     return app;
